@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 
-from app.schemas.schedule import ScheduleCreate, ScheduleResponse
-from app.services.schedule import create_schedule, get_schedule
+from app.schemas.schedule import ScheduleCreate, ScheduleResponse, ScheduleStatusUpdate, ScheduleStatus
+from app.services.schedule import create_schedule, get_schedule, update_schedule_status
 
 router = APIRouter(
     prefix="/schedules",
@@ -22,3 +22,21 @@ def api_get_schedule(schedule_id: int):
         )
     
     return schedule
+
+@router.patch("/{schedule_id}/status")
+def api_patch_schedule_status(schedule_id: int, body: ScheduleStatusUpdate):
+    try:
+        return update_schedule_status(schedule_id, body.status)
+    except ValueError as e:
+        message = str(e)
+
+        if message == "Schedule not found":
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=message
+            )
+        
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=message
+        )
