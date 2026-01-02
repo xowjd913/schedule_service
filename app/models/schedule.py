@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import date
+from datetime import datetime
 
 from enum import Enum
 
@@ -14,7 +14,7 @@ class Schedule(BaseModel):
     title: str
     description: str | None
     
-    date: date
+    date: datetime
 
     status: ScheduleStatus = ScheduleStatus.PENDING
 

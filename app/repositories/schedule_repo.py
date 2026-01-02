@@ -12,11 +12,11 @@ class ScheduleRepository:
         return schedule
     
     def get_by_id(self, db: Session, schedule_id: int) -> Optional[Schedule]:
-        return {
+        return (
             db.query(Schedule)
             .filter(Schedule.id == schedule_id)
             .first()
-        }
+        )
     
     def get_all(self, db: Session) -> List[Schedule]:
         return db.query(Schedule).all()

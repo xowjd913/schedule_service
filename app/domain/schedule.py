@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 from sqlalchemy import String, DateTime
@@ -22,14 +22,14 @@ class Schedule(Base):
     )
 
     scheduled_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.now(datetime.timezone.utc),
+        DateTime(timezone=True),
+        default=datetime.now(timezone.utc),
         nullable=False
     )
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.now(datetime.timezone.utc),
-        onupdate=datetime.now(datetime.timezone.utc),
+        DateTime(timezone=True),
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
         nullable=False
     )
