@@ -3,7 +3,9 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from app.domain.schedule import Schedule, ScheduleStatus
+from app.domain.schedule_recurrence import ScheduleRecurrence
 from app.repositories.schedule_repo import ScheduleRepository
+from app.schemas.schedule import ScheduleCreate
 
 class ScheduleService:
 
@@ -13,23 +15,30 @@ class ScheduleService:
     def create_schedule(
             self,
             db: Session,
-            title: str,
-            scheduled_at: datetime
+            user_id: int,
+            data: ScheduleCreate
     ) -> Schedule:
         
-        now = datetime.now(timezone.utc)
-
-        if scheduled_at < now:
-            raise ValueError("과거 일정은 생산 불가능.")
-        
         schedule = Schedule(
-            title=title,
-            scheduled_at=scheduled_at,
-            status=ScheduleStatus.PENDING
+            user_id=user_id,
+            title=data.title,
+            description=data.description,
+            start_at=data.start_at,
+            end_at=data.end_at,
+            is_all_day=data.is_all_day
         )
 
-        return self.repo.create(db, schedule)
-    
+        if data.recurrence:
+            schedule.recurrence = ScheduleRecurrence(
+                freq=data.recurrence.freq,
+                interval=data.recurrence.interval,
+                by_weekday=data.recurrence.by_weekday,
+                until=data.recurrence.until
+            )
+
+        return self.repo.save(db, schedule)
+
+
     def get_schedules(self, db: Session) -> List[Schedule]:
         return self.repo.get_all(db)
     
